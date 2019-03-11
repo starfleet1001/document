@@ -1,0 +1,54 @@
+
+
+指定父对象，有两种方式：
+	1）setParent
+	2）通过构造函数传参，如QPushButton b1(&w);
+指定父对象，只需要父对象显示，上面的子对象自动显示
+
+信号与槽：Qt对象之间通信的接口
+
+连接函数connect()
+用法：
+connect(&b1,&QPushButton::pressed,this,&MainWidget::close);
+/*&b1:信号接受者，指针类型
+ *&QPushButton::pressed:要处理的信号，&信号发送者的类名::信号名字
+ *this：信号接受者
+ *&MainWidget::close:槽函数，信号处理函数  &接受的类名::槽函数名字
+*/
+
+自定义槽：普通函数的用法
+在Qt5中：任意的成员函数，普通全局函数，静态函数
+槽函数需要和信号一致（参数，返回值）
+由于信号都是没有返回值，所以槽函数一定没有返回值
+用法：
+	connect(&b1,&QPushButton::pressed,this,&MainWidget::mySlot);//mySlot是自定义的属于MainWidget的函数
+	
+信号（singals）：
+	信号必须有signals关键字来声明
+	信号没有返回值，但可以有参数
+	信号就是函数的声明，只需声明，无需定义
+	使用emit mySignal();
+	信号可以重载（可以带参数）
+	
+Qt4的信号连接和Qt5有些不一样：
+	Qt4槽函数必须有slots关键字来修饰
+	connect(&subWin,SIGNAL(mySignal()),this,SLOT(dealSlot())
+	一般不建议用这种方法：
+		原因：SIGNAL  SLOT将函数名字->字符串 是宏，过程中不进行错误检查【因此建议采用Qt5的方式，但Qt5有信号重载的时候操作要麻烦一些】
+		
+Lambda表达式，匿名函数对象
+	C++11增加的新特性，项目文件配置：CONFIG += C++11
+	Qt配合信号一起使用，非常方便
+例子：
+int a =10,b = 100;
+connect(b4,&QPushButton::released,
+		//=:是把外部所有的局部变量、类中所有成员以值传递方式传入【也可以在[]中将单个或多个变量传入】，传入的时候默认为只读属性
+		//this:类中所有成员以值传递方式传入
+		//&：把外部所有局部变量，引用符号
+		[=]() mutable	//
+		{
+			b4->setText("123");
+			a=11;//报错，只读【加mutable后就不报错了】
+		}
+		
+指定父对象后【直接或间接继承与QObject】，子对象如果是动态分配空间的，不需要手动释放，系统会自动释放
